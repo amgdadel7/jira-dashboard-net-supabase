@@ -1,6 +1,8 @@
 using Nexus.Api.Dtos;
 using Nexus.Api.Models;
-using Supabase.Postgrest.Constants;
+// `Constants` is a static class holding nested enums (Operator, Ordering, …),
+// not a namespace — it needs `using static` to bring `Operator` into scope.
+using static Supabase.Postgrest.Constants;
 
 namespace Nexus.Api.Endpoints;
 
