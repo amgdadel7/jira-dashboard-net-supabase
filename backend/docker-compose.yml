@@ -1,0 +1,15 @@
+# Supabase is fully managed (cloud) — this file only runs the .NET API.
+#   cd backend && docker compose up --build
+# then set VITE_API_URL=http://localhost:7001 in the frontend's .env.local
+services:
+  api:
+    build: .
+    container_name: nexus-api
+    ports:
+      - "7001:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      # remember the double underscore → maps to Supabase:Url / Supabase:ServiceKey
+      Supabase__Url: ${SUPABASE_URL}
+      Supabase__ServiceKey: ${SUPABASE_SERVICE_KEY}
+    restart: unless-stopped
