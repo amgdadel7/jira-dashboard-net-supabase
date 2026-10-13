@@ -1,6 +1,6 @@
 using Nexus.Api.Dtos;
 using Nexus.Api.Models;
-using Postgrest.Constants;
+using Supabase.Postgrest.Constants;
 
 namespace Nexus.Api.Endpoints;
 
