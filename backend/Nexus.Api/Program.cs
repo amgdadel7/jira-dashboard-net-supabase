@@ -18,7 +18,7 @@ corsOrigins.AddRange(builder.Configuration.GetSection("Cors:AllowedOrigins").Get
 
 builder.Services.AddCors(o =>
     o.AddPolicy(UiCors, p => p
-        .WithOrigins(corsOrigins.Distinct().ToArray())
+        .AllowAnyOrigin()
         .AllowAnyHeader()
         .AllowAnyMethod()));
 

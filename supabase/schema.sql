@@ -98,11 +98,26 @@ alter table public.epics     enable row level security;
 alter table public.issues    enable row level security;
 alter table public.comments  enable row level security;
 
-create policy if not exists "read profiles"  on public.profiles  for select using (true);
-create policy if not exists "read projects"  on public.projects  for select using (true);
-create policy if not exists "read sprints"   on public.sprints   for select using (true);
-create policy if not exists "read epics"     on public.epics     for select using (true);
-create policy if not exists "read issues"    on public.issues    for select using (true);
-create policy if not exists "write issues"   on public.issues    for all    using (auth.role() = 'authenticated');
-create policy if not exists "read comments"  on public.comments  for select using (true);
-create policy if not exists "add comments"   on public.comments  for insert with check (auth.role() = 'authenticated');
+drop policy if exists "read profiles"  on public.profiles;
+create policy "read profiles"  on public.profiles  for select using (true);
+
+drop policy if exists "read projects"  on public.projects;
+create policy "read projects"  on public.projects  for select using (true);
+
+drop policy if exists "read sprints"   on public.sprints;
+create policy "read sprints"   on public.sprints   for select using (true);
+
+drop policy if exists "read epics"     on public.epics;
+create policy "read epics"     on public.epics     for select using (true);
+
+drop policy if exists "read issues"    on public.issues;
+create policy "read issues"    on public.issues    for select using (true);
+
+drop policy if exists "write issues"   on public.issues;
+create policy "write issues"   on public.issues    for all    using (auth.role() = 'authenticated');
+
+drop policy if exists "read comments"  on public.comments;
+create policy "read comments"  on public.comments  for select using (true);
+
+drop policy if exists "add comments"   on public.comments;
+create policy "add comments"   on public.comments  for insert with check (auth.role() = 'authenticated');
