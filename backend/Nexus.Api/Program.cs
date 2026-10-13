@@ -3,6 +3,12 @@ using Supabase;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Render (and most PaaS hosts) assign the listen port via $PORT — honour it,
+// falling back to ASPNETCORE_URLS / the Dockerfile default (8080) elsewhere.
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(port))
+    builder.WebHost.UseUrls($"http://+:{port}");
+
 const string UiCors = "ui";
 
 // Allowed browser origins: local dev/preview by default, plus any origins listed
@@ -36,10 +42,20 @@ builder.Services.AddSingleton(_ =>
 var app = builder.Build();
 
 // Initialize the client once at startup so row models can update themselves.
-using (var scope = app.Services.CreateScope())
+// Don't crash the process if Supabase is not configured/reachable yet (e.g. a
+// fresh Render deploy before env vars are set): /api/health must still answer
+// so the platform health check passes — data endpoints will fail until
+// Supabase:Url / Supabase:ServiceKey are set correctly, and this log says why.
+try
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<Supabase.Client>();
     await db.InitializeAsync();
+}
+catch (Exception ex)
+{
+    app.Logger.LogWarning(ex,
+        "Supabase initialization failed at startup — check Supabase:Url / Supabase:ServiceKey configuration. Data endpoints will fail until this is fixed.");
 }
 
 app.UseCors(UiCors);

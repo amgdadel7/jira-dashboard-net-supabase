@@ -52,6 +52,22 @@ SUPABASE_URL="https://<ref>.supabase.co" SUPABASE_SERVICE_KEY="<key>" docker com
 # API on http://localhost:7001 — point VITE_API_URL at it
 ```
 
+### Deploy the backend on Render
+
+The repo ships a Render Blueprint ([`render.yaml`](render.yaml)) — Render has
+no native .NET runtime, so the API deploys as a **Docker web service** built
+from `backend/Dockerfile`:
+
+1. Render Dashboard → **New → Blueprint** → connect this repo (or **New → Web
+   Service → Docker**, Dockerfile Path `./backend/Dockerfile`, Docker Context
+   `./backend`).
+2. Set the secret env vars in the Render dashboard (never committed):
+   `Supabase__Url`, `Supabase__ServiceKey` (service-role key — server side
+   only), and `Cors__AllowedOrigins__0` = your frontend's origin.
+3. The app binds to Render's `$PORT` automatically and answers health checks
+   at `/api/health`. Then set `VITE_API_URL=https://<service>.onrender.com`
+   for the frontend and rebuild it.
+
 > **No backend yet?** Skip steps 1–2 entirely. Without `VITE_API_URL` the app runs in
 > mock mode with a realistic in-memory dataset — every feature stays interactive.
 

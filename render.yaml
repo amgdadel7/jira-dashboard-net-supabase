@@ -1,0 +1,40 @@
+# ── Render Blueprint — Nexus.Api (.NET 9 backend) ─────────────────────────
+# Render does not run .NET natively, so the API deploys as a Docker web
+# service built from backend/Dockerfile (multi-stage dotnet publish).
+#
+# How to use:
+#   1. Render Dashboard → New → Blueprint → connect this repo (render.yaml
+#      is picked up automatically), or New → Web Service → Docker with
+#      Dockerfile Path = ./backend/Dockerfile and Docker Context = ./backend.
+#   2. Fill in the `sync: false` env vars below in the Render dashboard
+#      (they are never committed to git):
+#        Supabase__Url            https://<project-ref>.supabase.co
+#        Supabase__ServiceKey     <service-role key — server side only!>
+#        Cors__AllowedOrigins__0  https://<your-frontend-domain>
+#   3. Point the frontend at the deployed API: set
+#      VITE_API_URL=https://<this-service>.onrender.com and rebuild it.
+#
+# The app listens on $PORT (Render assigns it — see Program.cs) and answers
+# health checks on /api/health even before Supabase is configured.
+services:
+  - type: web
+    name: nexus-api
+    env: docker
+    region: frankfurt
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api/health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      # Double underscore maps to the Supabase:Url / Supabase:ServiceKey
+      # configuration keys (see backend/Nexus.Api/Program.cs).
+      - key: Supabase__Url
+        sync: false
+      - key: Supabase__ServiceKey
+        sync: false
+      # Browser origin of the deployed frontend, e.g. https://app.example.com
+      # (add Cors__AllowedOrigins__1, __2… for more origins).
+      - key: Cors__AllowedOrigins__0
+        sync: false
