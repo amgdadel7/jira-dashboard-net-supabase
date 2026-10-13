@@ -5,9 +5,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 const string UiCors = "ui";
 
+// Allowed browser origins: local dev/preview by default, plus any origins listed
+// in configuration (e.g. Cors__AllowedOrigins__0=https://your-app.example.com).
+var corsOrigins = new List<string> { "http://localhost:5173", "http://localhost:4173" };
+corsOrigins.AddRange(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? []);
+
 builder.Services.AddCors(o =>
     o.AddPolicy(UiCors, p => p
-        .WithOrigins("http://localhost:5173", "http://localhost:4173")
+        .WithOrigins(corsOrigins.Distinct().ToArray())
         .AllowAnyHeader()
         .AllowAnyMethod()));
 
